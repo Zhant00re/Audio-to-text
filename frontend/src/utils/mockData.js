@@ -1,61 +1,109 @@
-// Mock data and functions for testing the transcription app
-// This will be replaced with actual Vosk implementation
+import axios from "axios";
 
-const mockTranscriptions = {
-  en: [
-    "Hello, this is a test transcription in English. The speech recognition system is working properly and can detect various accents and speaking styles. This technology enables us to convert spoken words into written text with remarkable accuracy.",
-    "Welcome to our audio transcription service. We provide high-quality speech-to-text conversion for multiple languages. Our system can handle different audio formats and file sizes up to 2GB.",
-    "This is an example of English transcription. The system can recognize punctuation, pauses, and natural speech patterns. It's designed to work offline for maximum privacy and security."
-  ],
-  ru: [
-    "Привет, это тестовая транскрипция на русском языке. Система распознавания речи работает правильно и может обнаруживать различные акценты и стили речи. Эта технология позволяет нам преобразовывать произнесенные слова в письменный текст с замечательной точностью.",
-    "Добро пожаловать в наш сервис транскрипции аудио. Мы предоставляем высококачественное преобразование речи в текст для нескольких языков. Наша система может обрабатывать различные аудиоформаты и размеры файлов до 2 ГБ.",
-    "Это пример русской транскрипции. Система может распознавать знаки препинания, паузы и естественные речевые паттерны. Она разработана для работы в автономном режиме для максимальной конфиденциальности и безопасности."
-  ],
-  kk: [
-    "Сәлем, бұл қазақ тіліндегі тест транскрипциясы. Сөйлеуді тану жүйесі дұрыс жұмыс істейді және әртүрлі акцент пен сөйлеу стильдерін анықтай алады. Бұл технология айтылған сөздерді жазбаша мәтінге керемет дәлдікпен түрлендіруге мүмкіндік береді.",
-    "Біздің аудио транскрипция қызметімізге қош келдіңіз. Біз бірнеше тіл үшін жоғары сапалы сөйлеуден мәтінге түрлендіру қызметін ұсынамыз. Біздің жүйе әртүрлі аудио форматтарын және 2 ГБ дейінгі файл өлшемдерін өңдей алады.",
-    "Бұл қазақ транскрипциясының мысалы. Жүйе тыныс белгілерін, үзілістерді және табиғи сөйлеу үлгілерін тани алады. Ол максималды құпиялылық пен қауіпсіздік үшін дербес режимде жұмыс істеуге арналған."
-  ]
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+// Real API functions for Vosk transcription
+export const transcribeAudio = async (file, language) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('language', language);
+
+  try {
+    const response = await axios.post(`${API}/transcribe`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 300000, // 5 minutes timeout for large files
+    });
+
+    return {
+      success: response.data.success,
+      text: response.data.text,
+      language: response.data.language,
+      id: response.data.id,
+      filename: response.data.filename,
+      fileSize: response.data.fileSize,
+      createdAt: response.data.createdAt,
+      error: response.data.error
+    };
+  } catch (error) {
+    console.error('Transcription error:', error);
+    
+    if (error.response) {
+      return {
+        success: false,
+        error: error.response.data.detail || 'Transcription failed',
+        text: ""
+      };
+    } else if (error.request) {
+      return {
+        success: false,
+        error: 'Network error - please check your connection',
+        text: ""
+      };
+    } else {
+      return {
+        success: false,
+        error: error.message || 'Unknown error occurred',
+        text: ""
+      };
+    }
+  }
 };
 
-export const mockTranscribe = async (file, language) => {
-  // Simulate processing time
-  await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
-  
-  // Determine language for mock data
-  let selectedLanguage = language;
-  if (language === "auto") {
-    const languages = ["en", "ru", "kk"];
-    selectedLanguage = languages[Math.floor(Math.random() * languages.length)];
+export const getTranscriptions = async () => {
+  try {
+    const response = await axios.get(`${API}/transcriptions`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching transcriptions:', error);
+    throw error;
   }
-  
-  // Get random transcription text
-  const transcriptions = mockTranscriptions[selectedLanguage] || mockTranscriptions["en"];
-  const randomText = transcriptions[Math.floor(Math.random() * transcriptions.length)];
-  
-  // Calculate mock duration based on file size (rough estimate)
-  const mockDuration = Math.floor(file.size / (1024 * 100)) || 30; // Very rough estimate
-  
-  return {
-    text: randomText,
-    language: selectedLanguage,
-    duration: mockDuration,
-    confidence: 0.85 + Math.random() * 0.15 // Mock confidence score
-  };
+};
+
+export const getTranscription = async (id) => {
+  try {
+    const response = await axios.get(`${API}/transcriptions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching transcription:', error);
+    throw error;
+  }
+};
+
+export const deleteTranscription = async (id) => {
+  try {
+    const response = await axios.delete(`${API}/transcriptions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting transcription:', error);
+    throw error;
+  }
+};
+
+export const checkHealth = async () => {
+  try {
+    const response = await axios.get(`${API}/health`);
+    return response.data;
+  } catch (error) {
+    console.error('Error checking health:', error);
+    throw error;
+  }
 };
 
 export const getLanguageLabel = (code) => {
   const languages = {
     "en": "English",
     "ru": "Russian",
-    "kk": "Kazakh",
+    "kz": "Kazakh",
     "auto": "Auto-detect"
   };
   return languages[code] || code;
 };
 
 export const formatDuration = (seconds) => {
+  if (!seconds) return "0:00";
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, '0')}`;
