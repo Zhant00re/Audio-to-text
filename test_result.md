@@ -101,3 +101,181 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Test the VoiceScribe backend API with Vosk speech-to-text integration. Test health check, transcription endpoints with different scenarios, history management, and error handling."
+
+backend:
+  - task: "Health Check Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Health check endpoint working perfectly. Returns proper status, Vosk availability (true), available models (en, ru, kz), supported formats, and max file size. All required fields present in response."
+
+  - task: "Transcription Core Functionality"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Transcription endpoint working correctly. Successfully processes audio files, returns proper response structure with id, filename, language, text, fileSize, createdAt, success fields. Vosk integration functional."
+
+  - task: "Multi-language Support"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Multi-language transcription working. Successfully tested with English (en), Russian (ru), Kazakh (kz), and auto-detect languages. All language parameters accepted and processed correctly."
+
+  - task: "File Format Validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "File format validation working correctly. Properly rejects unsupported file formats with HTTP 400 status and appropriate error message. Supports MP3, WAV, OGG, M4A, FLAC formats as expected."
+
+  - task: "File Size Validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "File size validation implemented with 2GB limit. Normal sized files accepted correctly. Large file testing limited by resource constraints but validation logic is in place."
+
+  - task: "Language Parameter Validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Language parameter validation working correctly. Invalid language parameters properly rejected with HTTP 400 status and appropriate error message."
+
+  - task: "Transcription History - Get All"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "GET /api/transcriptions endpoint working correctly. Successfully retrieves all transcription history, returns proper array of transcription objects with correct fields."
+
+  - task: "Transcription History - Get Specific"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "GET /api/transcriptions/{id} endpoint working correctly. Successfully retrieves specific transcription by ID, returns proper transcription object with all required fields."
+
+  - task: "Transcription History - Delete"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "DELETE /api/transcriptions/{id} endpoint working correctly. Successfully deletes transcription by ID, returns appropriate success message."
+
+  - task: "Error Handling - 404 for Non-existent"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "404 error handling working correctly. Non-existent transcription IDs properly return HTTP 404 status with appropriate error message."
+
+  - task: "Error Handling - Missing Parameters"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Parameter validation working correctly. Missing file or language parameters properly rejected with HTTP 422 status (FastAPI validation error)."
+
+  - task: "MongoDB Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "MongoDB integration working correctly. Transcriptions successfully saved to database, retrieved, and deleted. Database operations functioning properly."
+
+  - task: "Vosk Speech Recognition Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/vosk_utils.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Vosk integration working correctly. Models loaded for en, ru, kz languages. Audio processing and transcription pipeline functional. Health check confirms Vosk availability."
+
+frontend:
+  # Frontend testing not performed as per instructions
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "testing"
+      message: "Comprehensive backend API testing completed successfully. All core functionality working correctly. VoiceScribe backend API is fully functional with 95.2% test success rate (20/21 tests passed). Only minor timeout issue on API root endpoint which resolved on retry. All critical features including health check, transcription with multi-language support, file validation, history management, and error handling are working properly. Vosk integration is functional with models available for English, Russian, and Kazakh languages. MongoDB integration working correctly for data persistence."
