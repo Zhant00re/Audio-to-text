@@ -37,6 +37,7 @@ export const TranscriptionProvider = ({ children }) => {
   return (
     <TranscriptionContext.Provider value={{
       transcriptions,
+      setTranscriptions,
       isProcessing,
       setIsProcessing,
       addTranscription,
