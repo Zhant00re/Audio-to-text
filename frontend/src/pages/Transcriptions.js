@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FileText, Download, Trash2, Clock, FileAudio, Languages, Search, Filter } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -8,13 +8,37 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../components/ui/alert-dialog";
 import { useTranscription } from "../contexts/TranscriptionContext";
 import { useToast } from "../hooks/use-toast";
+import { getTranscriptions, deleteTranscription as deleteTranscriptionAPI, getLanguageLabel, formatFileSize } from "../utils/mockData";
 
 const Transcriptions = () => {
-  const { transcriptions, deleteTranscription } = useTranscription();
+  const { transcriptions, setTranscriptions } = useTranscription();
   const [searchTerm, setSearchTerm] = useState("");
   const [languageFilter, setLanguageFilter] = useState("all");
   const [selectedTranscription, setSelectedTranscription] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  // Load transcriptions from backend on component mount
+  useEffect(() => {
+    loadTranscriptions();
+  }, []);
+
+  const loadTranscriptions = async () => {
+    setLoading(true);
+    try {
+      const backendTranscriptions = await getTranscriptions();
+      setTranscriptions(backendTranscriptions);
+    } catch (error) {
+      console.error('Failed to load transcriptions:', error);
+      toast({
+        title: "Failed to load transcriptions",
+        description: "Could not fetch transcription history from server",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredTranscriptions = transcriptions.filter(t => {
     const matchesSearch = t.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -24,7 +48,7 @@ const Transcriptions = () => {
   });
 
   const handleExport = (transcription, format) => {
-    const content = `File: ${transcription.fileName}\nLanguage: ${transcription.language}\nDate: ${new Date(transcription.createdAt).toLocaleString()}\nDuration: ${transcription.duration}s\n\n${transcription.text}`;
+    const content = `File: ${transcription.fileName}\nLanguage: ${getLanguageLabel(transcription.language)}\nDate: ${new Date(transcription.createdAt).toLocaleString()}\n\n${transcription.text}`;
     
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -42,31 +66,36 @@ const Transcriptions = () => {
     });
   };
 
-  const handleDelete = (id) => {
-    deleteTranscription(id);
-    toast({
-      title: "Transcription deleted",
-      description: "The transcription has been removed from your history",
-    });
+  const handleDelete = async (id) => {
+    try {
+      await deleteTranscriptionAPI(id);
+      setTranscriptions(prev => prev.filter(t => t.id !== id));
+      toast({
+        title: "Transcription deleted",
+        description: "The transcription has been removed from your history",
+      });
+    } catch (error) {
+      console.error('Failed to delete transcription:', error);
+      toast({
+        title: "Failed to delete",
+        description: "Could not delete transcription from server",
+        variant: "destructive",
+      });
+    }
   };
 
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const getLanguageLabel = (code) => {
-    const languages = {
-      "en": "English",
-      "ru": "Russian", 
-      "kk": "Kazakh",
-      "auto": "Auto-detect"
-    };
-    return languages[code] || code;
-  };
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+            Transcription History
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -100,7 +129,7 @@ const Transcriptions = () => {
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="en">English</SelectItem>
               <SelectItem value="ru">Russian</SelectItem>
-              <SelectItem value="kk">Kazakh</SelectItem>
+              <SelectItem value="kz">Kazakh</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -169,10 +198,6 @@ const Transcriptions = () => {
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-4 text-sm text-slate-600 dark:text-slate-400">
                   <div className="flex items-center space-x-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{transcription.duration}s</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
                     <FileText className="w-4 h-4" />
                     <span>{formatFileSize(transcription.fileSize)}</span>
                   </div>
@@ -231,7 +256,6 @@ const Transcriptions = () => {
                     {getLanguageLabel(selectedTranscription.language)}
                   </Badge>
                   <span>{new Date(selectedTranscription.createdAt).toLocaleString()}</span>
-                  <span>{selectedTranscription.duration}s</span>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
