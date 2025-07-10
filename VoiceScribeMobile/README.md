@@ -1,97 +1,287 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# VoiceScribe Mobile
 
-# Getting Started
+A lightweight and secure mobile application for offline speech-to-text transcription supporting Russian, Kazakh, and English languages.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- ✅ **Fully Offline Processing**: All transcription happens locally on your device
+- ✅ **Multi-Language Support**: Russian, Kazakh, and English
+- ✅ **No Internet Required**: Complete offline functionality
+- ✅ **Local Storage**: All data stored securely on your device
+- ✅ **Real-time Transcription**: Live speech recognition
+- ✅ **Audio File Support**: Upload and transcribe audio files
+- ✅ **Export Options**: Export transcriptions in TXT, JSON, or RTF formats
+- ✅ **Dark/Light Theme**: Customizable appearance
+- ✅ **Privacy First**: No data sent to external servers
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Screenshots
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+*[Screenshots would go here in a real application]*
 
-```sh
-# Using npm
-npm start
+## Installation
 
-# OR using Yarn
-yarn start
-```
+### Prerequisites
 
-## Step 2: Build and run your app
+- Node.js (>= 18)
+- React Native CLI
+- Android Studio (for Android development)
+- Xcode (for iOS development)
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd VoiceScribeMobile
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **iOS Setup:**
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+4. **Android Setup:**
+   - Ensure Android Studio is installed
+   - Set up Android SDK and emulator
+
+## Running the App
 
 ### Android
 
-```sh
-# Using npm
+```bash
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+npm run ios
 ```
 
-Then, and every time you update your native dependencies, run:
+### Metro Bundler
 
-```sh
-bundle exec pod install
+```bash
+npm start
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Usage
 
-```sh
-# Using npm
+### Recording Audio
+
+1. **Select Language**: Choose from English, Russian, or Kazakh
+2. **Start Recording**: Tap the record button to start speech recognition
+3. **Stop Recording**: Tap again to stop and save the transcription
+4. **Review**: The transcription will appear in real-time and be saved automatically
+
+### Uploading Audio Files
+
+1. **Tap "Upload Audio File"** button on the home screen
+2. **Select an audio file** from your device (MP3, WAV, M4A, etc.)
+3. **Choose language** for transcription
+4. **Process**: The file will be transcribed and saved
+
+### Managing Transcriptions
+
+1. **View History**: Navigate to the "History" tab to see all transcriptions
+2. **Search**: Use the search bar to find specific transcriptions
+3. **Edit**: Tap "Edit" to modify transcription text
+4. **Share**: Share transcriptions via system share dialog
+5. **Export**: Export individual transcriptions or all at once
+6. **Delete**: Remove unwanted transcriptions
+
+### Settings
+
+- **Toggle Theme**: Switch between light and dark modes
+- **Export All**: Export all transcriptions in various formats
+- **Clear Data**: Remove all stored transcriptions
+- **Privacy Info**: Learn about data handling
+
+## Supported File Formats
+
+### Audio Input
+- MP3 (.mp3)
+- WAV (.wav)
+- M4A (.m4a)
+- OGG (.ogg)
+- FLAC (.flac)
+- AAC (.aac)
+
+### Export Formats
+- Plain Text (.txt)
+- JSON (.json)
+- Rich Text Format (.rtf)
+
+## Language Support
+
+| Language | Code | Status |
+|----------|------|--------|
+| English  | en   | ✅ Full Support |
+| Russian  | ru   | ✅ Full Support |
+| Kazakh   | kk   | ✅ Full Support |
+
+## Privacy & Security
+
+VoiceScribe is designed with privacy as a priority:
+
+- ✅ **No Internet Connection Required**: All processing happens locally
+- ✅ **No Data Collection**: No analytics or tracking
+- ✅ **No Account Required**: No sign-up or login needed
+- ✅ **Local Storage Only**: Data never leaves your device
+- ✅ **No External APIs**: No communication with external servers
+
+## Architecture
+
+### Key Components
+
+- **React Native**: Cross-platform mobile framework
+- **@react-native-voice/voice**: Native speech recognition
+- **AsyncStorage**: Local data persistence
+- **React Context**: State management
+- **TypeScript**: Type safety
+
+### File Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Base UI components
+│   └── Navigation.tsx  # Bottom navigation
+├── screens/            # Main application screens
+│   ├── HomeScreen.tsx  # Recording and upload
+│   ├── TranscriptionsScreen.tsx  # History management
+│   └── SettingsScreen.tsx        # App settings
+├── contexts/           # React Context providers
+│   └── AppContext.tsx  # Global state management
+├── utils/              # Utility functions
+│   ├── voiceService.ts # Speech recognition logic
+│   ├── fileService.ts  # File handling
+│   ├── storage.ts      # Local storage
+│   ├── textProcessor.ts # Text formatting
+│   └── constants.ts    # App constants
+└── types/              # TypeScript definitions
+    └── index.ts        # Type definitions
+```
+
+## Configuration
+
+### Android Permissions
+
+The app requires these permissions on Android:
+- `RECORD_AUDIO`: For voice recording
+- `WRITE_EXTERNAL_STORAGE`: For file exports
+- `READ_EXTERNAL_STORAGE`: For file imports
+
+### iOS Permissions
+
+The app requires these permissions on iOS:
+- `NSMicrophoneUsageDescription`: For voice recording
+- `NSSpeechRecognitionUsageDescription`: For speech recognition
+
+## Development
+
+### Available Scripts
+
+```bash
+# Start Metro bundler
+npm start
+
+# Run on Android
+npm run android
+
+# Run on iOS
 npm run ios
 
-# OR using Yarn
-yarn ios
+# Run tests
+npm test
+
+# Lint code
+npm run lint
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Build for Production
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+#### Android APK
+```bash
+cd android
+./gradlew assembleRelease
+```
 
-## Step 3: Modify your app
+#### iOS Archive
+```bash
+cd ios
+xcodebuild -workspace VoiceScribeMobile.xcworkspace -scheme VoiceScribeMobile -configuration Release
+```
 
-Now that you have successfully run the app, let's make changes!
+## Troubleshooting
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### Common Issues
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+1. **Voice Recognition Not Working**
+   - Check microphone permissions
+   - Ensure device supports speech recognition
+   - Try restarting the app
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+2. **Audio File Not Processing**
+   - Verify file format is supported
+   - Check file size (max 100MB)
+   - Ensure storage permissions are granted
 
-## Congratulations! :tada:
+3. **App Crashes on Startup**
+   - Clear app data and cache
+   - Reinstall the application
+   - Check device compatibility
 
-You've successfully run and modified your React Native App. :partying_face:
+### Error Messages
 
-### Now what?
+- **"Voice recognition not supported"**: Device doesn't support speech recognition
+- **"Microphone permission required"**: Grant microphone access in settings
+- **"File too large"**: Use smaller audio files (< 100MB)
+- **"Unsupported format"**: Use supported audio formats
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## Contributing
 
-# Troubleshooting
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## License
 
-# Learn More
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-To learn more about React Native, take a look at the following resources:
+## Support
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+For support, please contact:
+- Email: support@voicescribe.app
+- Website: https://voicescribe.app
+
+## Acknowledgments
+
+- React Native team for the excellent framework
+- Voice recognition library contributors
+- Open source community for various libraries used
+
+## Changelog
+
+### Version 1.0.0
+- Initial release
+- Multi-language speech recognition
+- Offline processing
+- File upload support
+- Export functionality
+- Dark/light theme support
+
+## Roadmap
+
+- [ ] Additional language support
+- [ ] Improved accuracy with custom models
+- [ ] Batch processing for multiple files
+- [ ] Cloud backup option (optional)
+- [ ] Advanced text formatting
+- [ ] Voice commands for navigation
