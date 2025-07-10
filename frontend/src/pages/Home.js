@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { Textarea } from "../components/ui/textarea";
 import { useTranscription } from "../contexts/TranscriptionContext";
 import { useToast } from "../hooks/use-toast";
-import { mockTranscribe } from "../utils/mockData";
+import { transcribeAudio } from "../utils/mockData";
 
 const Home = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -47,45 +47,49 @@ const Home = () => {
     setIsProcessing(true);
     setProcessingProgress(0);
 
-    // Simulate processing progress
+    // Start progress animation
     const progressInterval = setInterval(() => {
       setProcessingProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
+        if (prev >= 85) {
           return prev;
         }
-        return prev + Math.random() * 10;
+        return prev + Math.random() * 5;
       });
-    }, 500);
+    }, 1000);
 
     try {
-      // Mock transcription - replace with actual Vosk implementation
-      const result = await mockTranscribe(selectedFile, selectedLanguage);
-      setTranscriptionResult(result.text);
+      // Real transcription using Vosk
+      const result = await transcribeAudio(selectedFile, selectedLanguage);
       
-      // Add to transcriptions history
-      addTranscription({
-        fileName: selectedFile.name,
-        language: selectedLanguage,
-        text: result.text,
-        duration: result.duration,
-        fileSize: selectedFile.size,
-      });
+      if (result.success) {
+        setTranscriptionResult(result.text);
+        
+        // Add to transcriptions history
+        addTranscription({
+          fileName: selectedFile.name,
+          language: result.language,
+          text: result.text,
+          fileSize: selectedFile.size,
+        });
 
-      setProcessingProgress(100);
-      clearInterval(progressInterval);
-      
-      toast({
-        title: "Transcription completed!",
-        description: `Successfully transcribed ${selectedFile.name}`,
-      });
+        setProcessingProgress(100);
+        
+        toast({
+          title: "Transcription completed!",
+          description: `Successfully transcribed ${selectedFile.name}`,
+        });
+      } else {
+        throw new Error(result.error || "Transcription failed");
+      }
     } catch (error) {
+      console.error("Transcription error:", error);
       toast({
         title: "Transcription failed",
-        description: error.message,
+        description: error.message || "An error occurred during transcription",
         variant: "destructive",
       });
     } finally {
+      clearInterval(progressInterval);
       setIsProcessing(false);
       setTimeout(() => setProcessingProgress(0), 2000);
     }
@@ -117,7 +121,7 @@ const Home = () => {
         <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 px-4 py-2 rounded-full">
           <Sparkles className="w-4 h-4 text-blue-600" />
           <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-            100% Local Processing
+            100% Local Processing with Vosk
           </span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white">
@@ -149,7 +153,7 @@ const Home = () => {
                   <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  MP3, WAV, M4A, OGG (Max 2GB)
+                  MP3, WAV, M4A, OGG, FLAC (Max 2GB)
                 </p>
               </div>
               <input
@@ -173,7 +177,7 @@ const Home = () => {
                 </p>
               </div>
               <Badge variant="secondary">
-                {selectedFile.type.split("/")[1].toUpperCase()}
+                {selectedFile.type.split("/")[1]?.toUpperCase() || "AUDIO"}
               </Badge>
             </div>
           )}
@@ -192,7 +196,7 @@ const Home = () => {
                   <SelectItem value="auto">Auto-detect</SelectItem>
                   <SelectItem value="en">English</SelectItem>
                   <SelectItem value="ru">Russian</SelectItem>
-                  <SelectItem value="kk">Kazakh</SelectItem>
+                  <SelectItem value="kz">Kazakh</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -215,7 +219,7 @@ const Home = () => {
           {isProcessing && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">Processing...</span>
+                <span className="text-slate-600 dark:text-slate-400">Processing with Vosk...</span>
                 <span className="text-slate-600 dark:text-slate-400">
                   {Math.round(processingProgress)}%
                 </span>
