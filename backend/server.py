@@ -10,7 +10,6 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import uuid
 from datetime import datetime
-import aiofiles
 
 from vosk_utils import transcribe_audio, get_available_languages, health_check
 
