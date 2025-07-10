@@ -11,7 +11,17 @@ from typing import List, Optional
 import uuid
 from datetime import datetime
 
-from vosk_utils import transcribe_audio, get_available_languages, health_check
+try:
+    from vosk_utils import transcribe_audio, get_available_languages, health_check
+    VOSK_UTILS_AVAILABLE = True
+except ImportError:
+    VOSK_UTILS_AVAILABLE = False
+    def transcribe_audio(*args, **kwargs):
+        return {"success": False, "error": "Vosk utilities not available", "text": ""}
+    def get_available_languages():
+        return {}
+    def health_check():
+        return {"vosk_available": False, "pydub_available": False, "models_available": {}, "ready": False}
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
